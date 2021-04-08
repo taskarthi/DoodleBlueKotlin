@@ -4,6 +4,8 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.os.StrictMode
+import android.os.StrictMode.VmPolicy
 import android.provider.ContactsContract
 import android.view.View
 import android.widget.ListView
@@ -13,6 +15,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import java.util.*
+import java.util.concurrent.ExecutionException
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 
 
 class ReadContactActivity : AppCompatActivity() {
@@ -21,6 +26,16 @@ class ReadContactActivity : AppCompatActivity() {
     var contactsInfoList: MutableList<ContactsInfo?>? = null
     var phReceiver: PhoneStateReceiver? = null
     override fun onCreate(savedInstanceState: Bundle?) {
+
+           /* StrictMode.setThreadPolicy(
+                StrictMode.ThreadPolicy.Builder()
+                    .detectDiskReads()
+                    .detectDiskWrites()
+                    .detectAll() // or .detectAll() for all detectable problems
+                    .penaltyLog()
+                    .build())
+*/
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_readcontact)
         listView = findViewById<View>(R.id.lstContacts) as ListView
@@ -63,6 +78,15 @@ class ReadContactActivity : AppCompatActivity() {
                             arrayOf(contactId),
                             null
                         )
+                        try {
+
+                        } catch (e: ExecutionException) {
+                            e.printStackTrace()
+                        } catch (e: InterruptedException) {
+                            e.printStackTrace()
+                        } catch (e: TimeoutException) {
+                            e.printStackTrace()
+                        }
                         if (phoneCursor!!.moveToNext()) {
                             val phoneNumber =
                                 phoneCursor.getString(phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
@@ -79,6 +103,7 @@ class ReadContactActivity : AppCompatActivity() {
                 contactsInfoList!!
             )
             listView!!.adapter = dataAdapter
+
         }
 
     fun requestcalls() {

@@ -3,9 +3,11 @@ package com.doodleblue
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.CountDownTimer
 import android.telephony.PhoneNumberUtils
 import android.telephony.TelephonyManager
 import android.widget.PopupWindow
+import android.widget.Toast
 
 
 class PhoneStateReceiver : BroadcastReceiver() {
@@ -19,13 +21,10 @@ class PhoneStateReceiver : BroadcastReceiver() {
                 incomingNumber = incomingNumber!!.substring(3)
                 val preferences = context.getSharedPreferences("login", 0)
                 val strMobile = preferences.getString("mobile", null)
+                val strName   = preferences.getString("name", null)
+
                 if (PhoneNumberUtils.compare(strMobile, incomingNumber)) {
-                    val i = Intent(context, IncomingCallActivity::class.java)
-                    i.putExtra("mobile", strMobile)
-                    i.putExtras(intent)
-                    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    i.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-                    context.startActivity(i)
+                    Toast.makeText(context,"Mobile Number"+strMobile+"  Name "+strName,Toast.LENGTH_LONG).show()
                 }
             }
         } catch (e: Exception) {

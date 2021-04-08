@@ -19,7 +19,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1.2"
             android:padding="5dp"
-            />
+            android:textColor="@color/black"/>
 
         <TextView
             android:id="@+id/phoneNumber"
@@ -27,6 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1.2"
             android:padding="5dp"
+            android:textColor="@color/black"
             />
 
         <CheckBox

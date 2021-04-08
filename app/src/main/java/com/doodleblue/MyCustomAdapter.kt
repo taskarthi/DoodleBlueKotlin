@@ -1,13 +1,11 @@
 package com.doodleblue
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.CheckBox
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
 
 class MyCustomAdapter(context: Context, resource: Int, private val contactsInfoList: List<*>) :  ArrayAdapter<Any?>(context, resource, contactsInfoList) {
 
@@ -37,13 +35,14 @@ class MyCustomAdapter(context: Context, resource: Int, private val contactsInfoL
             contactsInfoList[position] as ContactsInfo
         holder.displayName?.setText(contactsInfo.displayName)
         holder.phoneNumber?.setText(contactsInfo.phoneNumber)
-        val finalHolder: ViewHolder? = holder
-        holder.llLinear?.setOnClickListener(View.OnClickListener {
+
+       /* val finalHolder: ViewHolder? = holder
+        holder.checkbox?.setOnClickListener(View.OnClickListener {
             if (finalHolder?.checkbox?.isChecked() == true) {
                 val preferencesimg = context.getSharedPreferences(
-                    "login", 0
-                )
+                    "login", 0)
                 val editorimg = preferencesimg.edit()
+                editorimg.putString("name", contactsInfo.displayName)
                 editorimg.putString("mobile", contactsInfo.phoneNumber?.replace(" ", ""))
                 editorimg.apply()
             } else {
@@ -51,10 +50,30 @@ class MyCustomAdapter(context: Context, resource: Int, private val contactsInfoL
                     "login", 0
                 )
                 val editorimg = preferencesimg.edit()
+                editorimg.putString("name","")
                 editorimg.putString("mobile", "")
                 editorimg.apply()
             }
-        })
+        })*/
+
+        holder.checkbox?.setOnCheckedChangeListener { _, isChecked ->
+            if(isChecked){
+                val preferencesimg = context.getSharedPreferences(
+                    "login", 0)
+                val editorimg = preferencesimg.edit()
+                editorimg.putString("name", contactsInfo.displayName)
+                editorimg.putString("mobile", contactsInfo.phoneNumber?.replace(" ", ""))
+                editorimg.apply()
+            }else{
+                val preferencesimg = context.getSharedPreferences(
+                    "login", 0
+                )
+                val editorimg = preferencesimg.edit()
+                editorimg.putString("name","")
+                editorimg.putString("mobile", "")
+                editorimg.apply()
+            }
+        }
         return convertView!!
     }
 }
