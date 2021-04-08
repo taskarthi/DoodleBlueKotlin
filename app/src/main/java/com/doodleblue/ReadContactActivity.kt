@@ -2,10 +2,9 @@ package com.doodleblue
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.database.Cursor
 import android.os.Build
 import android.os.Bundle
-import android.os.StrictMode
-import android.os.StrictMode.VmPolicy
 import android.provider.ContactsContract
 import android.view.View
 import android.widget.ListView
@@ -15,9 +14,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import java.util.*
-import java.util.concurrent.ExecutionException
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.TimeoutException
 
 
 class ReadContactActivity : AppCompatActivity() {
@@ -26,15 +22,6 @@ class ReadContactActivity : AppCompatActivity() {
     var contactsInfoList: MutableList<ContactsInfo?>? = null
     var phReceiver: PhoneStateReceiver? = null
     override fun onCreate(savedInstanceState: Bundle?) {
-
-           /* StrictMode.setThreadPolicy(
-                StrictMode.ThreadPolicy.Builder()
-                    .detectDiskReads()
-                    .detectDiskWrites()
-                    .detectAll() // or .detectAll() for all detectable problems
-                    .penaltyLog()
-                    .build())
-*/
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_readcontact)
@@ -47,63 +34,39 @@ class ReadContactActivity : AppCompatActivity() {
     }
 
     private val contacts: Unit
-        private get() {
-            var contactId: String? = null
-            var displayName: String? = null
+        private get (){
             contactsInfoList = ArrayList<ContactsInfo?>()
-            val cursor = contentResolver.query(
-                ContactsContract.Contacts.CONTENT_URI,
-                null,
-                null,
-                null,
-                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC"
-            )
-            if (cursor!!.count > 0) {
-                while (cursor.moveToNext()) {
-                    val hasPhoneNumber =
-                        cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))
-                            .toInt()
-                    if (hasPhoneNumber > 0) {
-                        val contactsInfo = ContactsInfo()
-                        contactId =
-                            cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID))
-                        displayName =
-                            cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME))
-                        contactsInfo.contactId = contactId
-                        contactsInfo.displayName = displayName
-                        val phoneCursor = contentResolver.query(
-                            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                            null,
-                            ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
-                            arrayOf(contactId),
-                            null
-                        )
-                        try {
-
-                        } catch (e: ExecutionException) {
-                            e.printStackTrace()
-                        } catch (e: InterruptedException) {
-                            e.printStackTrace()
-                        } catch (e: TimeoutException) {
-                            e.printStackTrace()
-                        }
-                        if (phoneCursor!!.moveToNext()) {
-                            val phoneNumber =
-                                phoneCursor.getString(phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
-                            contactsInfo.phoneNumber = phoneNumber
-                        }
-                        phoneCursor.close()
-                        contactsInfoList!!.add(contactsInfo)
-                    }
+            val cr = contentResolver
+            val cur: Cursor? =
+                cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null)
+            if (cur!!.getCount() > 0) {
+                while (cur?.moveToNext()) {
+                    val contactsInfo = ContactsInfo()
+                    var name: String =
+                        cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME))
+                    var phonenumber: String =
+                        cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
+                    name = name.replace(",".toRegex(), "")
+                    phonenumber = phonenumber.replace(",".toRegex(), "")
+                    contactsInfo.displayName = name
+                    contactsInfo.phoneNumber = phonenumber
+                    contactsInfoList!!.add(contactsInfo)
                 }
             }
-            cursor.close()
-            dataAdapter = MyCustomAdapter(
-                applicationContext, R.layout.contact_info,
-                contactsInfoList!!
-            )
-            listView!!.adapter = dataAdapter
-
+            try {
+                dataAdapter = MyCustomAdapter(
+                    applicationContext, R.layout.contact_info,
+                    contactsInfoList!!
+                )
+                listView!!.adapter = dataAdapter
+                listView!!.setOnItemClickListener { parent, view, position, id ->
+                    val dataModel: ContactsInfo = contactsInfoList!![position] as ContactsInfo
+                    dataModel.checked = !dataModel.checked
+                    dataAdapter!!.notifyDataSetChanged()
+                }
+            }catch (e: Exception){
+                e.printStackTrace()
+            }
         }
 
     fun requestcalls() {
@@ -199,33 +162,17 @@ class ReadContactActivity : AppCompatActivity() {
             }
             PERMISSION_REQUEST_READ_PHONE_STATE -> {
                 if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(
-                        this,
-                        "Permission granted: " + PERMISSION_REQUEST_READ_PHONE_STATE,
-                        Toast.LENGTH_SHORT
-                    ).show()
+
                 } else {
-                    Toast.makeText(
-                        this,
-                        "Permission NOT granted: " + PERMISSION_REQUEST_READ_PHONE_STATE,
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    finish()
                 }
                 return
             }
             PERMISSION_REQUEST_READ_CALLLOG -> {
                 if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(
-                        this,
-                        "Permission granted: " + PERMISSION_REQUEST_READ_CALLLOG,
-                        Toast.LENGTH_SHORT
-                    ).show()
+
                 } else {
-                    Toast.makeText(
-                        this,
-                        "Permission NOT granted: " + PERMISSION_REQUEST_READ_CALLLOG,
-                        Toast.LENGTH_SHORT
-                    ).show()
+
                 }
                 return
             }

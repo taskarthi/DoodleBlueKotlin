@@ -3,15 +3,15 @@ package com.doodleblue
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.os.CountDownTimer
 import android.telephony.PhoneNumberUtils
 import android.telephony.TelephonyManager
-import android.widget.PopupWindow
+import android.util.Log
+import android.view.WindowManager
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 
 
 class PhoneStateReceiver : BroadcastReceiver() {
-    var popupWindow: PopupWindow? = null
     override fun onReceive(context: Context, intent: Intent) {
         try {
             println("Receiver start")
@@ -22,11 +22,24 @@ class PhoneStateReceiver : BroadcastReceiver() {
                 val preferences = context.getSharedPreferences("login", 0)
                 val strMobile = preferences.getString("mobile", null)
                 val strName   = preferences.getString("name", null)
+                Log.i("mobile",strMobile.toString());
+                if(PhoneNumberUtils.compare(strMobile, incomingNumber)) {
+                    /*val dlgBuilder = AlertDialog.Builder(context)
+                    dlgBuilder.setTitle("Context Example")
+                    dlgBuilder.setMessage("I am being shown from the application Static context!")
+                    dlgBuilder.setNeutralButton("Ok", null)
+                    dlgBuilder.show()*/
+                    for (i in 0..8) {
 
-                if (PhoneNumberUtils.compare(strMobile, incomingNumber)) {
-                    Toast.makeText(context,"Mobile Number"+strMobile+"  Name "+strName,Toast.LENGTH_LONG).show()
+                        Toast.makeText(
+                            context,
+                            "Mobile Number " + strMobile + "  Name " + strName,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             }
+
         } catch (e: Exception) {
             e.printStackTrace()
         }

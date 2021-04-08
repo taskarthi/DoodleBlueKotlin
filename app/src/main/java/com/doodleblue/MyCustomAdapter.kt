@@ -1,7 +1,6 @@
 package com.doodleblue
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,31 +9,38 @@ import android.widget.*
 class MyCustomAdapter(context: Context, resource: Int, private val contactsInfoList: List<*>) :  ArrayAdapter<Any?>(context, resource, contactsInfoList) {
 
     private inner class ViewHolder {
-        var displayName: TextView? = null
-        var phoneNumber: TextView? = null
-        var checkbox: CheckBox? = null
-        var llLinear: LinearLayout? = null
+        lateinit var displayName: TextView
+        lateinit var phoneNumber: TextView
+        lateinit var checkbox: CheckBox
+    }
+    override fun getCount(): Int {
+        return contactsInfoList.size
+    }
+    override fun getItem(position: Int): ContactsInfo {
+        return contactsInfoList[position] as ContactsInfo
     }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         var convertView = convertView
         var holder: ViewHolder? = null
+        val result: View
         if (convertView == null) {
             val vi = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
             convertView = vi.inflate(R.layout.contact_info, null)
             holder = ViewHolder()
             holder.displayName = convertView!!.findViewById<View>(R.id.displayName) as TextView
-            holder.phoneNumber = convertView.findViewById<View>(R.id.phoneNumber) as TextView
-            holder.checkbox = convertView.findViewById<View>(R.id.checkBox) as CheckBox
-            holder.llLinear = convertView.findViewById<View>(R.id.llrow) as LinearLayout
+            holder.phoneNumber = convertView!!.findViewById<View>(R.id.phoneNumber) as TextView
+            holder.checkbox = convertView!!.findViewById<View>(R.id.checkBox) as CheckBox
+            result = convertView
             convertView.setTag(holder)
         } else {
             holder = convertView.tag as ViewHolder
+            result = convertView
         }
-        val contactsInfo: ContactsInfo =
+       val contactsInfo: ContactsInfo =
             contactsInfoList[position] as ContactsInfo
-        holder.displayName?.setText(contactsInfo.displayName)
-        holder.phoneNumber?.setText(contactsInfo.phoneNumber)
+        /* holder.displayName?.setText(contactsInfo.displayName)
+        holder.phoneNumber?.setText(contactsInfo.phoneNumber)*/
 
        /* val finalHolder: ViewHolder? = holder
         holder.checkbox?.setOnClickListener(View.OnClickListener {
@@ -56,7 +62,7 @@ class MyCustomAdapter(context: Context, resource: Int, private val contactsInfoL
             }
         })*/
 
-        holder.checkbox?.setOnCheckedChangeListener { _, isChecked ->
+       holder.checkbox?.setOnCheckedChangeListener { _, isChecked ->
             if(isChecked){
                 val preferencesimg = context.getSharedPreferences(
                     "login", 0)
@@ -74,6 +80,12 @@ class MyCustomAdapter(context: Context, resource: Int, private val contactsInfoL
                 editorimg.apply()
             }
         }
-        return convertView!!
+
+        val item: ContactsInfo = getItem(position)
+        holder.displayName.text = item.displayName
+        holder.phoneNumber.text = item.phoneNumber
+        holder.checkbox.isChecked = item.checked
+
+        return result
     }
 }
