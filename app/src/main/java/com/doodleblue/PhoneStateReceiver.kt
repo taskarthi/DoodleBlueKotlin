@@ -6,9 +6,8 @@ import android.content.Intent
 import android.telephony.PhoneNumberUtils
 import android.telephony.TelephonyManager
 import android.util.Log
-import android.view.WindowManager
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
+
 
 
 class PhoneStateReceiver : BroadcastReceiver() {
