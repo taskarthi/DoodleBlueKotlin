@@ -1,4 +1,4 @@
-package com.doodleblue
+package com.doodleblue.model
 
 class ContactsInfo {
     var displayName: String? = null

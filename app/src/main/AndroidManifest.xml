@@ -21,7 +21,7 @@
             </intent-filter>
         </activity>
         <receiver
-            android:name=".PhoneStateReceiver"
+            android:name=".broadcast.PhoneStateReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>

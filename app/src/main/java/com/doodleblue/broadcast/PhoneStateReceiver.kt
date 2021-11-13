@@ -1,4 +1,4 @@
-package com.doodleblue
+package com.doodleblue.broadcast
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -7,8 +7,6 @@ import android.telephony.PhoneNumberUtils
 import android.telephony.TelephonyManager
 import android.util.Log
 import android.widget.Toast
-
-
 
 class PhoneStateReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {

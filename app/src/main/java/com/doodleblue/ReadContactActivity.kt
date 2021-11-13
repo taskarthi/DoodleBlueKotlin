@@ -2,74 +2,66 @@ package com.doodleblue
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.database.Cursor
 import android.os.Build
 import android.os.Bundle
-import android.provider.ContactsContract
-import android.view.View
-import android.widget.ListView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModelProvider
+import com.doodleblue.adapter.MyCustomAdapter
+import com.doodleblue.broadcast.PhoneStateReceiver
+import com.doodleblue.databinding.ActivityReadcontactBinding
+import com.doodleblue.model.ContactsInfo
+import com.doodleblue.viewmodel.ContactsViewModel
+import kotlinx.android.synthetic.main.activity_readcontact.*
 import java.util.*
-
+import kotlin.collections.ArrayList
 
 class ReadContactActivity : AppCompatActivity() {
-    var dataAdapter: MyCustomAdapter? = null
-    var listView: ListView? = null
-    var contactsInfoList: MutableList<ContactsInfo?>? = null
-    var phReceiver: PhoneStateReceiver? = null
+
+    private var dataAdapter: MyCustomAdapter? = null
+    private var phReceiver: PhoneStateReceiver? = null
+    private var binding: ActivityReadcontactBinding? = null
+    private lateinit var contactsViewModel: ContactsViewModel
+    private var contacts = ArrayList<ContactsInfo>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_readcontact)
-        listView = findViewById<View>(R.id.lstContacts) as ListView
-        listView!!.adapter = dataAdapter
+        contactsViewModel =
+            ViewModelProvider(this).get(ContactsViewModel::class.java)
+        binding =
+            DataBindingUtil.setContentView(this, R.layout.activity_readcontact)
+        contactsViewModel.getContacts(contentResolver)
+        lstContacts!!.adapter = dataAdapter
         phReceiver = PhoneStateReceiver()
         requestContactPermission()
-        requestcalls()
-        requestcallsLog()
-    }
+        requestCalls()
+        requestCallsLog()
 
-    private val contacts: Unit
-        private get (){
-            contactsInfoList = ArrayList<ContactsInfo?>()
-            val cr = contentResolver
-            val cur: Cursor? =
-                cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null)
-            if (cur!!.getCount() > 0) {
-                while (cur?.moveToNext()) {
-                    val contactsInfo = ContactsInfo()
-                    var name: String =
-                        cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME))
-                    var phonenumber: String =
-                        cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
-                    name = name.replace(",".toRegex(), "")
-                    phonenumber = phonenumber.replace(",".toRegex(), "")
-                    contactsInfo.displayName = name
-                    contactsInfo.phoneNumber = phonenumber
-                    contactsInfoList!!.add(contactsInfo)
-                }
-            }
+        contactsViewModel.contactsInfoLiveData?.observe(this, androidx.lifecycle.Observer {
             try {
+                contacts = it
                 dataAdapter = MyCustomAdapter(
                     applicationContext, R.layout.contact_info,
-                    contactsInfoList!!
+                    it!!
                 )
-                listView!!.adapter = dataAdapter
-                listView!!.setOnItemClickListener { parent, view, position, id ->
-                    val dataModel: ContactsInfo = contactsInfoList!![position] as ContactsInfo
+                lstContacts!!.adapter = dataAdapter
+                lstContacts!!.setOnItemClickListener { parent, view, position, id ->
+                    val dataModel: ContactsInfo = it!![position] as ContactsInfo
                     dataModel.checked = !dataModel.checked
                     dataAdapter!!.notifyDataSetChanged()
                 }
             }catch (e: Exception){
                 e.printStackTrace()
             }
-        }
+        })
+    }
 
-    fun requestcalls() {
+    private fun requestCalls() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_DENIED || checkSelfPermission(
                     Manifest.permission.CALL_PHONE
@@ -82,7 +74,7 @@ class ReadContactActivity : AppCompatActivity() {
         }
     }
 
-    fun requestcallsLog() {
+    private fun requestCallsLog() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ContextCompat.checkSelfPermission(
                     this@ReadContactActivity,
@@ -104,7 +96,7 @@ class ReadContactActivity : AppCompatActivity() {
         }
     }
 
-    fun requestContactPermission() {
+    private fun requestContactPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ContextCompat.checkSelfPermission(
                     this,
