@@ -42,7 +42,7 @@ class ReadContactActivity : AppCompatActivity() {
                 contacts = it
                 dataAdapter = MyCustomAdapter(
                     applicationContext, R.layout.contact_info,
-                    it!!
+                    it!!.sortedBy { it.displayName }
                 )
                 lstContacts!!.adapter = dataAdapter
                 lstContacts!!.setOnItemClickListener { parent, view, position, id ->
@@ -83,4 +83,5 @@ class ReadContactActivity : AppCompatActivity() {
     companion object {
         const val PERMISSIONS_REQUEST_READ_CONTACTS = 1
     }
+
 }

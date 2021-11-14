@@ -41,28 +41,6 @@ class MyCustomAdapter(context: Context, resource: Int, private val contactsInfoL
         }
        val contactsInfo: ContactsInfo =
             contactsInfoList[position] as ContactsInfo
-        /* holder.displayName?.setText(contactsInfo.displayName)
-        holder.phoneNumber?.setText(contactsInfo.phoneNumber)*/
-
-       /* val finalHolder: ViewHolder? = holder
-        holder.checkbox?.setOnClickListener(View.OnClickListener {
-            if (finalHolder?.checkbox?.isChecked() == true) {
-                val preferencesimg = context.getSharedPreferences(
-                    "login", 0)
-                val editorimg = preferencesimg.edit()
-                editorimg.putString("name", contactsInfo.displayName)
-                editorimg.putString("mobile", contactsInfo.phoneNumber?.replace(" ", ""))
-                editorimg.apply()
-            } else {
-                val preferencesimg = context.getSharedPreferences(
-                    "login", 0
-                )
-                val editorimg = preferencesimg.edit()
-                editorimg.putString("name","")
-                editorimg.putString("mobile", "")
-                editorimg.apply()
-            }
-        })*/
 
        holder.checkbox?.setOnCheckedChangeListener { _, isChecked ->
             if(isChecked){
