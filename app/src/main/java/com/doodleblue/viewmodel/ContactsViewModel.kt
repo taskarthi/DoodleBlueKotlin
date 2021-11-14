@@ -10,13 +10,13 @@ import java.util.ArrayList
 
 class ContactsViewModel: ViewModel() {
 
-    var contactsInfoLiveData: MutableLiveData<ArrayList<ContactsInfo>>? = null
+    var contactsInfoLiveData: MutableLiveData<ArrayList<ContactsInfo>> = MutableLiveData<ArrayList<ContactsInfo>>()
 
     fun getContacts(cr: ContentResolver) {
         val contactsInfoList = ArrayList<ContactsInfo>()
         val cur: Cursor? =
             cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null)
-        if (cur!!.getCount() > 0) {
+        if (cur!!.count > 0) {
             while (cur?.moveToNext()) {
                 val contactsInfo = ContactsInfo()
                 var name: String =
