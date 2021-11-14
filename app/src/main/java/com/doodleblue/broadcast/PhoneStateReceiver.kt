@@ -14,7 +14,7 @@ import android.widget.Toast
 import com.doodleblue.R
 
 
-class PhoneStateReceiver() : BroadcastReceiver() {
+class PhoneStateReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         println("Receiver start")
         val state = intent.extras!!.getString(TelephonyManager.EXTRA_STATE)
@@ -23,10 +23,15 @@ class PhoneStateReceiver() : BroadcastReceiver() {
             val preferences = context.getSharedPreferences("login", 0)
             val strMobile = preferences.getString("mobile", null)
             val strName = preferences.getString("name", null)
-            Log.i("mobile", strMobile.toString());
-            Log.i("mobile1", incomingNumber.toString());
+            Log.i("mobile", strMobile.toString())
+            Log.i("mobile1", incomingNumber.toString())
 
-            if (!strMobile.isNullOrEmpty() && PhoneNumberUtils.compare(context, strMobile, incomingNumber) ) {
+            if (!strMobile.isNullOrEmpty() && PhoneNumberUtils.compare(
+                    context,
+                    strMobile,
+                    incomingNumber
+                )
+            ) {
                 //start activity which has dialog
                 val toast: Toast = Toast.makeText(
                     context,
@@ -45,7 +50,7 @@ class PhoneStateReceiver() : BroadcastReceiver() {
                 )
                 toastMessage.gravity = Gravity.CENTER
                 toastMessage.compoundDrawablePadding = 16
-                toastView!!.setBackgroundColor(Color.BLACK)
+                toastView.setBackgroundColor(Color.BLACK)
                 toast.setGravity(Gravity.CENTER, 0, 0)
                 toast.show()
             }

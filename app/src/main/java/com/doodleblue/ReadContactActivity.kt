@@ -2,14 +2,10 @@ package com.doodleblue
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.doodleblue.adapter.MyCustomAdapter
@@ -18,8 +14,6 @@ import com.doodleblue.databinding.ActivityReadcontactBinding
 import com.doodleblue.model.ContactsInfo
 import com.doodleblue.viewmodel.ContactsViewModel
 import kotlinx.android.synthetic.main.activity_readcontact.*
-import java.util.*
-import kotlin.collections.ArrayList
 
 class ReadContactActivity : AppCompatActivity() {
 
@@ -38,18 +32,18 @@ class ReadContactActivity : AppCompatActivity() {
             DataBindingUtil.setContentView(this, R.layout.activity_readcontact)
         requestCalls()
         phReceiver = PhoneStateReceiver()
-        contactsViewModel.contactsInfoLiveData?.observe(this, androidx.lifecycle.Observer {
-                contacts = it
-                dataAdapter = MyCustomAdapter(
-                    applicationContext, R.layout.contact_info,
-                    it!!.sortedBy { it.displayName }
-                )
-                lstContacts!!.adapter = dataAdapter
-                lstContacts!!.setOnItemClickListener { parent, view, position, id ->
-                    val dataModel: ContactsInfo = it!![position] as ContactsInfo
-                    dataModel.checked = !dataModel.checked
-                    dataAdapter!!.notifyDataSetChanged()
-                }
+        contactsViewModel.contactsInfoLiveData.observe(this, androidx.lifecycle.Observer {
+            contacts = it
+            dataAdapter = MyCustomAdapter(
+                applicationContext, R.layout.contact_info,
+                it!!.sortedBy { it.displayName }
+            )
+            lstContacts!!.adapter = dataAdapter
+            lstContacts!!.setOnItemClickListener { parent, view, position, id ->
+                val dataModel: ContactsInfo = it[position]
+                dataModel.checked = !dataModel.checked
+                dataAdapter!!.notifyDataSetChanged()
+            }
         })
     }
 
@@ -75,7 +69,11 @@ class ReadContactActivity : AppCompatActivity() {
                 // Permission is granted
                 contactsViewModel.getContacts(contentResolver)
             } else {
-                Toast.makeText(this, "Until you grant the permission, we canot display the names", Toast.LENGTH_SHORT).show();
+                Toast.makeText(
+                    this,
+                    "Until you grant the permission, we canot display the names",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
